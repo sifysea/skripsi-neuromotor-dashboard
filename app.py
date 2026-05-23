@@ -426,13 +426,31 @@ trained_models, scaler, eval_df, fma_profiles, confusion_matrices = train_and_ca
 
 def scan_prmd_samples():
     samples = []
+    
+    # 1. Scan folder samples/ terkompresi di repositori GitHub (untuk deployed cloud fallback)
+    github_samples_dir = os.path.join(SCRIPT_DIR, "samples")
+    if os.path.exists(github_samples_dir):
+        for path in glob.glob(os.path.join(github_samples_dir, "m*_*_positions*.txt*")):
+            filename = os.path.basename(path)
+            is_inc = "_inc" in filename
+            samples.append({
+                "path": path,
+                "filename": filename,
+                "type": "Incorrect (Gangguan) [GitHub Sample]" if is_inc else "Correct (Normal) [GitHub Sample]"
+            })
+            
+    # 2. Scan folder Vicon asli jika repositori penuh diclone di lokal
     if os.path.exists(CORRECT_POS_DIR):
         for path in glob.glob(os.path.join(CORRECT_POS_DIR, "m*_*_positions.txt*")):
-            samples.append({"path": path, "filename": os.path.basename(path), "type": "Correct (Normal)"})
+            filename = os.path.basename(path)
+            if not any(s["filename"] == filename for s in samples):
+                samples.append({"path": path, "filename": filename, "type": "Correct (Normal) [Vicon Repo]"})
             
     if os.path.exists(INCORRECT_POS_DIR):
         for path in glob.glob(os.path.join(INCORRECT_POS_DIR, "m*_*_positions_inc.txt*")):
-            samples.append({"path": path, "filename": os.path.basename(path), "type": "Incorrect (Gangguan)"})
+            filename = os.path.basename(path)
+            if not any(s["filename"] == filename for s in samples):
+                samples.append({"path": path, "filename": filename, "type": "Incorrect (Gangguan) [Vicon Repo]"})
             
     samples.sort(key=lambda x: x["filename"])
     return samples
