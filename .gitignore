@@ -1,0 +1,25 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Streamlit config/cache
+.streamlit/
+
+# Local data analysis clones (very large)
+UI-PRMD-Analysis/
+
+# Local outputs
+output_fma/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE / System files
+.gemini/
+.idea/
+.vscode/
+.DS_Store
